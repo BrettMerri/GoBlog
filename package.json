@@ -1,0 +1,28 @@
+{
+  "name": "goblog",
+  "version": "1.0.0",
+  "description": "blog created with go backend and react frontend",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run frontend & npm run backend",
+    "frontend": "watchify -o backend/public/bundle.js -v -d frontend/main.js",
+    "backend": "cd backend; go run main.go"
+  },
+  "dependencies": {
+    "browserify": "*",
+    "react": "*",
+    "react-dom": "*",
+    "reactify": "*",
+    "watchify": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brettmerri/goblog.git"
+  },
+  "author": "Brett Merrifield",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brettmerri/goblog/issues"
+  },
+  "homepage": "https://github.com/brettmerri/goblog#readme"
+}

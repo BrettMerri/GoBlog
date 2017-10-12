@@ -3,7 +3,7 @@ package articles
 import (
 	"fmt"
 
-	"github.com/brettmerri/GoBlog/models"
+	"github.com/brettmerri/GoBlog/backend/models"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -38,9 +38,7 @@ func Add(c *gin.Context) {
 
 	if err != nil {
 		fmt.Printf("Can't add article, go error %v\n", err)
-		c.JSON(400, gin.H{
-			"Error": err,
-		})
+		c.JSON(200, err)
 	}
 
 	c.JSON(200, gin.H{
