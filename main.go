@@ -14,7 +14,6 @@ func init() {
 }
 
 func main() {
-	dbCollection := bootstrap(Session)
 
 	router := gin.Default()
 	router.GET("/article", articles.read)

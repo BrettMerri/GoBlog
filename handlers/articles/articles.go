@@ -3,17 +3,18 @@ package articles
 import (
 	"fmt"
 
+	"github.com/brettmerri/GoBlog/models"
+	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/gin-gonic/gin"
-	"github.com/brettmerri/GoBlog/models"
 )
 
-func read(dbCollection *mgo.Collection) {
+func read(c *gin.Context) {
+	db := c.MustGet("db").(*mgo.Database)
 
 	article := models.Article{}
 
-	err := dbCollection.Find(bson.M{"title": "Ale"}).One(&result)
+	err := db.C(models.CollectionArticle).Find(bson.M{"title": "Ale"}).One(&article)
 
 	if err != nil {
 		fmt.Printf("Can't find article, go error %v\n", err)
@@ -21,16 +22,13 @@ func read(dbCollection *mgo.Collection) {
 	}
 
 	c.JSON(200, article)
-
-	return result
 }
 
-func add(dbCollection *mgo.Collection) {
+func add(c *gin.Context) {
+	db := c.MustGet("db").(*mgo.Database)
 
-	article := models.Article{}
-
-	err := dbCollection.Insert(&article{Title: "Ale", Body: "+55 53 1234 4321"},
-		&article{Title: "Cla", Body: "+66 33 1234 5678"})
+	err := db.C(models.CollectionArticle).Insert(models.Article{Title: "Ale", Body: "+55 53 1234 4321"},
+		models.Article{Title: "Cla", Body: "+66 33 1234 5678"})
 
 	if err != nil {
 		fmt.Printf("Can't add article, go error %v\n", err)
@@ -38,6 +36,6 @@ func add(dbCollection *mgo.Collection) {
 	}
 
 	c.JSON(200, gin.H{
-		"result": true
+		"result": true,
 	})
 }
