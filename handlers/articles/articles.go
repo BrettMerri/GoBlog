@@ -9,7 +9,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func read(c *gin.Context) {
+func Read(c *gin.Context) {
 	db := c.MustGet("db").(*mgo.Database)
 
 	article := models.Article{}
@@ -24,7 +24,7 @@ func read(c *gin.Context) {
 	c.JSON(200, article)
 }
 
-func add(c *gin.Context) {
+func Add(c *gin.Context) {
 	db := c.MustGet("db").(*mgo.Database)
 
 	err := db.C(models.CollectionArticle).Insert(models.Article{Title: "Ale", Body: "+55 53 1234 4321"},

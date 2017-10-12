@@ -16,8 +16,8 @@ func init() {
 func main() {
 
 	router := gin.Default()
-	router.GET("/article", articles.read)
-	router.GET("/add", articles.add)
+	router.GET("/article", articles.Read)
+	router.GET("/add", articles.Add)
 
 	router.Run() // listen and serve on 0.0.0.0:8080
 }
