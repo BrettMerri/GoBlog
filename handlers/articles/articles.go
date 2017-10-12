@@ -38,7 +38,9 @@ func Add(c *gin.Context) {
 
 	if err != nil {
 		fmt.Printf("Can't add article, go error %v\n", err)
-		panic(err.Error())
+		c.JSON(400, gin.H{
+			"Error": err,
+		})
 	}
 
 	c.JSON(200, gin.H{
