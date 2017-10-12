@@ -50,7 +50,7 @@ func bootstrap(db *mgo.Database) *mgo.Collection {
 	c := db.C(models.CollectionArticle)
 
 	index := mgo.Index{
-		Key:        []string{"name"},
+		Key:        []string{"title"},
 		Unique:     true,
 		Background: true,
 	}
