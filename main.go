@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/brettmerri/GoBlog/db"
 	"github.com/brettmerri/GoBlog/handlers/articles"
+	"github.com/brettmerri/GoBlog/middlewares"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2"
 )
@@ -16,6 +17,10 @@ func init() {
 func main() {
 
 	router := gin.Default()
+
+	router.Use(middlewares.Connect)
+	router.Use(middlewares.ErrorHandler)
+
 	router.GET("/article", articles.Read)
 	router.GET("/add", articles.Add)
 
