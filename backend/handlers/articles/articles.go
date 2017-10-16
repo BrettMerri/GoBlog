@@ -11,39 +11,58 @@ import (
 
 // Read : read article from DB
 func Read(c *gin.Context) {
+	id := c.Param("id")
 	db := c.MustGet("db").(*mgo.Database)
 
 	article := models.Article{}
 
 	col := bootstrap(db)
 
-	err := col.Find(bson.M{"title": "Ale"}).One(&article)
+	err := col.FindId(bson.ObjectIdHex(id)).One(&article)
 
 	if err != nil {
 		fmt.Printf("Can't find article, go error %v\n", err)
-		panic(err.Error())
+		c.JSON(400, err)
 	}
 
 	c.JSON(200, article)
 }
 
-// Add : add article from DB
-func Add(c *gin.Context) {
+// ReadAll : read all articles from DB
+func ReadAll(c *gin.Context) {
 	db := c.MustGet("db").(*mgo.Database)
+
+	articles := []models.Article{}
 
 	col := bootstrap(db)
 
-	err := col.Insert(models.Article{Title: "Ale", Body: "+55 53 1234 4321"},
-		models.Article{Title: "Cla", Body: "+66 33 1234 5678"})
+	err := col.Find(nil).All(&articles)
 
 	if err != nil {
-		fmt.Printf("Can't add article, go error %v\n", err)
-		c.JSON(200, err)
+		fmt.Printf("Can't find articles, go error %v\n", err)
+		c.JSON(400, err)
 	}
 
-	c.JSON(200, gin.H{
-		"result": true,
-	})
+	c.JSON(200, articles)
+}
+
+// Add : add article from DB
+func Add(c *gin.Context) {
+	var json models.Article
+	if c.BindJSON(&json) == nil {
+		db := c.MustGet("db").(*mgo.Database)
+		col := bootstrap(db)
+		err := col.Insert(models.Article{Title: json.Title, Body: json.Body})
+		if err != nil {
+			fmt.Printf("Can't add article, go error %v\n", err)
+			c.JSON(400, err)
+		} else {
+			c.JSON(200, gin.H{
+				"result": true,
+			})
+		}
+
+	}
 }
 
 func bootstrap(db *mgo.Database) *mgo.Collection {

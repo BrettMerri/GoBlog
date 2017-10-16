@@ -29,8 +29,12 @@ func main() {
 
 	api := router.Group("/api")
 	{
-		api.GET("/article", articles.Read)
-		api.GET("/add", articles.Add)
+		article := api.Group("/article")
+		{
+			article.GET("/", articles.ReadAll)
+			article.GET("/:id", articles.Read)
+			article.POST("/add", articles.Add)
+		}
 	}
 
 	router.Run(":8080") // listen and serve on 0.0.0.0:8080
