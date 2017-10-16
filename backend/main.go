@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/BrettMerri/GoBlog/backend/handlers/users"
 	"github.com/brettmerri/GoBlog/backend/db"
 	"github.com/brettmerri/GoBlog/backend/handlers/articles"
 	"github.com/brettmerri/GoBlog/backend/middlewares"
@@ -31,9 +32,17 @@ func main() {
 	{
 		article := api.Group("/article")
 		{
-			article.GET("/", articles.ReadAll)
-			article.GET("/:id", articles.Read)
+			article.GET("/read", articles.ReadAll)
+			article.GET("/read/:id", articles.Read)
 			article.POST("/add", articles.Add)
+			article.POST("/delete", articles.Delete)
+		}
+		user := api.Group("/user")
+		{
+			user.GET("/read", users.ReadAll)
+			user.GET("/read/:id", users.Read)
+			user.POST("/add", users.Add)
+			user.POST("/delete", users.Delete)
 		}
 	}
 

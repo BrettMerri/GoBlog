@@ -1,4 +1,4 @@
-package articles
+package users
 
 import (
 	"fmt"
@@ -9,52 +9,52 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Read : read article from DB
+// Read : read user from DB
 func Read(c *gin.Context) {
 	id := c.Param("id")
 	db := c.MustGet("db").(*mgo.Database)
 
-	article := models.Article{}
+	user := models.User{}
 
 	col := bootstrap(db)
 
-	err := col.FindId(bson.ObjectIdHex(id)).One(&article)
+	err := col.FindId(bson.ObjectIdHex(id)).One(&user)
 
 	if err != nil {
-		fmt.Printf("Can't find article, go error %v\n", err)
+		fmt.Printf("Can't find user, go error %v\n", err)
 		c.JSON(400, err)
 	} else {
-		c.JSON(200, article)
+		c.JSON(200, user)
 	}
 }
 
-// ReadAll : read all articles from DB
+// ReadAll : read all users from DB
 func ReadAll(c *gin.Context) {
 	db := c.MustGet("db").(*mgo.Database)
 
-	articles := []models.Article{}
+	users := []models.User{}
 
 	col := bootstrap(db)
 
-	err := col.Find(nil).All(&articles)
+	err := col.Find(nil).All(&users)
 
 	if err != nil {
-		fmt.Printf("Can't find articles, go error %v\n", err)
+		fmt.Printf("Can't find users, go error %v\n", err)
 		c.JSON(400, err)
 	} else {
-		c.JSON(200, articles)
+		c.JSON(200, users)
 	}
 }
 
-// Add : add article from DB
+// Add : add user from DB
 func Add(c *gin.Context) {
-	var json models.Article
+	var json models.User
 	if c.BindJSON(&json) == nil {
 		db := c.MustGet("db").(*mgo.Database)
 		col := bootstrap(db)
-		err := col.Insert(models.Article{Title: json.Title, Body: json.Body})
+		err := col.Insert(models.User{Username: json.Username})
 		if err != nil {
-			fmt.Printf("Can't add article, go error %v\n", err)
+			fmt.Printf("Can't add user, go error %v\n", err)
 			c.JSON(400, gin.H{
 				"result": false,
 			})
@@ -69,15 +69,15 @@ func Add(c *gin.Context) {
 	}
 }
 
-// Delete : delete article from DB
+// Delete : delete user from DB
 func Delete(c *gin.Context) {
-	var json models.Article
+	var json models.User
 	if c.BindJSON(&json) == nil {
 		db := c.MustGet("db").(*mgo.Database)
 		col := bootstrap(db)
 		err := col.RemoveId(json.ID)
 		if err != nil {
-			fmt.Printf("Can't delete article, go error %v\n", err)
+			fmt.Printf("Can't delete user, go error %v\n", err)
 			c.JSON(400, gin.H{
 				"result": false,
 			})
@@ -87,16 +87,16 @@ func Delete(c *gin.Context) {
 			})
 		}
 	} else {
-		fmt.Printf("Error: Can't delete article")
-		c.JSON(400, "Error: Can't delete article")
+		fmt.Printf("Error: Can't delete user")
+		c.JSON(400, "Error: Can't delete user")
 	}
 }
 
 func bootstrap(db *mgo.Database) *mgo.Collection {
-	c := db.C("articles")
+	c := db.C("users")
 
 	index := mgo.Index{
-		Key:        []string{"title"},
+		Key:        []string{"username"},
 		Unique:     true,
 		Background: true,
 	}
