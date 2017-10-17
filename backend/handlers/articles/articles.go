@@ -16,9 +16,7 @@ func Read(c *gin.Context) {
 
 	article := models.Article{}
 
-	col := bootstrap(db)
-
-	err := col.FindId(bson.ObjectIdHex(id)).One(&article)
+	err := db.C("articles").FindId(bson.ObjectIdHex(id)).One(&article)
 
 	if err != nil {
 		fmt.Printf("Can't find article, go error %v\n", err)
@@ -34,9 +32,7 @@ func ReadAll(c *gin.Context) {
 
 	articles := []models.Article{}
 
-	col := bootstrap(db)
-
-	err := col.Find(nil).All(&articles)
+	err := db.C("articles").Find(nil).All(&articles)
 
 	if err != nil {
 		fmt.Printf("Can't find articles, go error %v\n", err)
@@ -49,33 +45,42 @@ func ReadAll(c *gin.Context) {
 // Add : add article from DB
 func Add(c *gin.Context) {
 	var json models.Article
-	if c.BindJSON(&json) == nil {
+	var err error
+	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
-		col := bootstrap(db)
-		err := col.Insert(models.Article{Title: json.Title, Body: json.Body, User: json.User})
+		user := models.User{}
+		err := db.C("users").FindId(json.User.ID).One(&user)
 		if err != nil {
-			fmt.Printf("Can't add article, go error %v\n", err)
+			fmt.Printf("Can't find user, go error %v\n", err)
 			c.JSON(400, gin.H{
 				"result": false,
 			})
 		} else {
-			c.JSON(200, gin.H{
-				"result": true,
-			})
+			err := db.C("articles").Insert(models.Article{Title: json.Title, Body: json.Body, User: user})
+			if err != nil {
+				fmt.Printf("Can't add article, go error %v\n", err)
+				c.JSON(400, gin.H{
+					"result": false,
+				})
+			} else {
+				c.JSON(200, gin.H{
+					"result": true,
+				})
+			}
 		}
 	} else {
-		fmt.Printf("Error: Can't add article")
-		c.JSON(400, "Error: Can't add article")
+		fmt.Printf(err.Error())
+		c.JSON(400, err.Error())
 	}
 }
 
 // Delete : delete article from DB
 func Delete(c *gin.Context) {
 	var json models.Article
-	if c.BindJSON(&json) == nil {
+	var err error
+	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
-		col := bootstrap(db)
-		err := col.RemoveId(json.ID)
+		err := db.C("articles").RemoveId(json.ID)
 		if err != nil {
 			fmt.Printf("Can't delete article, go error %v\n", err)
 			c.JSON(400, gin.H{
@@ -87,21 +92,7 @@ func Delete(c *gin.Context) {
 			})
 		}
 	} else {
-		fmt.Printf("Error: Can't delete article")
-		c.JSON(400, "Error: Can't delete article")
+		fmt.Printf(err.Error())
+		c.JSON(400, err.Error())
 	}
-}
-
-func bootstrap(db *mgo.Database) *mgo.Collection {
-	c := db.C("articles")
-
-	index := mgo.Index{
-		Key:        []string{"title"},
-		Unique:     true,
-		Background: true,
-	}
-
-	c.EnsureIndex(index)
-
-	return c
 }

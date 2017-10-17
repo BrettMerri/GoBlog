@@ -49,7 +49,8 @@ func ReadAll(c *gin.Context) {
 // Add : add user from DB
 func Add(c *gin.Context) {
 	var json models.User
-	if c.BindJSON(&json) == nil {
+	var err error
+	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
 		col := bootstrap(db)
 		err := col.Insert(models.User{Username: json.Username})
@@ -64,15 +65,16 @@ func Add(c *gin.Context) {
 			})
 		}
 	} else {
-		fmt.Printf("Error: Can't add article")
-		c.JSON(400, "Error: Can't add article")
+		fmt.Printf(err.Error())
+		c.JSON(400, err.Error())
 	}
 }
 
 // Delete : delete user from DB
 func Delete(c *gin.Context) {
 	var json models.User
-	if c.BindJSON(&json) == nil {
+	var err error
+	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
 		col := bootstrap(db)
 		err := col.RemoveId(json.ID)
@@ -87,8 +89,8 @@ func Delete(c *gin.Context) {
 			})
 		}
 	} else {
-		fmt.Printf("Error: Can't delete user")
-		c.JSON(400, "Error: Can't delete user")
+		fmt.Printf(err.Error())
+		c.JSON(400, err.Error())
 	}
 }
 

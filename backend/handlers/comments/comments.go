@@ -12,41 +12,52 @@ import (
 // Add : add comment to DB
 func Add(c *gin.Context) {
 	var json models.Comment
-	if c.BindJSON(&json) == nil {
+	var err error
+	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
 		nextCommentID := getNextCommentID(db)
-		fmt.Println(nextCommentID)
-		col := bootstrap(db)
-
-		pushComment := bson.M{"$push": bson.M{"comments": bson.M{"id": nextCommentID, "body": json.Body, "user": json.User}}}
-
-		err := col.Update(bson.M{"_id": json.Article}, pushComment)
-
+		user := models.User{}
+		err := db.C("users").FindId(json.User.ID).One(&user)
 		if err != nil {
-			fmt.Printf("Can't add comment, go error %v\n", err)
+			fmt.Printf("Can't find user, go error %v\n", err)
 			c.JSON(400, gin.H{
 				"result": false,
 			})
 		} else {
-			c.JSON(200, gin.H{
-				"result": true,
-			})
+			pushComment := bson.M{"$push": bson.M{"comments": bson.M{"id": nextCommentID, "body": json.Body, "user": user}}}
+
+			err := db.C("articles").Update(bson.M{"_id": json.Article}, pushComment)
+
+			if err != nil {
+				fmt.Printf("Can't add comment, go error %v\n", err)
+				c.JSON(400, gin.H{
+					"result": false,
+				})
+			} else {
+				c.JSON(200, gin.H{
+					"result": true,
+				})
+			}
 		}
 	} else {
-		fmt.Println("Error: Can't add comment")
-		c.JSON(400, "Error: Can't add comment")
+		fmt.Println(err.Error())
+		c.JSON(400, err.Error())
 	}
 }
 
 // Delete : delete comment from DB
 func Delete(c *gin.Context) {
 	var json models.Comment
-	if c.BindJSON(&json) == nil {
+	var err error
+	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
-		col := bootstrap(db)
-		err := col.RemoveId(json.ID)
+
+		pullComment := bson.M{"$pull": bson.M{"comments": bson.M{"id": json.ID}}}
+
+		err := db.C("articles").Update(bson.M{"_id": json.Article}, pullComment)
+
 		if err != nil {
-			fmt.Printf("Can't delete comment, go error %v\n", err)
+			fmt.Printf("Can't remove comment, go error %v\n", err)
 			c.JSON(400, gin.H{
 				"result": false,
 			})
@@ -56,8 +67,8 @@ func Delete(c *gin.Context) {
 			})
 		}
 	} else {
-		fmt.Println("Error: Can't delete comment")
-		c.JSON(400, "Error: Can't delete comment")
+		fmt.Println(err.Error())
+		c.JSON(400, err.Error())
 	}
 }
 
@@ -74,9 +85,4 @@ func getNextCommentID(db *mgo.Database) int {
 	}
 	newID := result["counterValue"].(int)
 	return newID
-}
-
-func bootstrap(db *mgo.Database) *mgo.Collection {
-	c := db.C("articles")
-	return c
 }
