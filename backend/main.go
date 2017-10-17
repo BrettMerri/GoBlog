@@ -4,6 +4,7 @@ import (
 	"github.com/BrettMerri/GoBlog/backend/handlers/users"
 	"github.com/brettmerri/GoBlog/backend/db"
 	"github.com/brettmerri/GoBlog/backend/handlers/articles"
+	"github.com/brettmerri/GoBlog/backend/handlers/comments"
 	"github.com/brettmerri/GoBlog/backend/middlewares"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -43,6 +44,11 @@ func main() {
 			user.GET("/read/:id", users.Read)
 			user.POST("/add", users.Add)
 			user.POST("/delete", users.Delete)
+		}
+		comment := api.Group("/comment")
+		{
+			comment.POST("/add", comments.Add)
+			comment.POST("/delete", comments.Delete)
 		}
 	}
 

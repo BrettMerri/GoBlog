@@ -52,7 +52,7 @@ func Add(c *gin.Context) {
 	if c.BindJSON(&json) == nil {
 		db := c.MustGet("db").(*mgo.Database)
 		col := bootstrap(db)
-		err := col.Insert(models.Article{Title: json.Title, Body: json.Body})
+		err := col.Insert(models.Article{Title: json.Title, Body: json.Body, User: json.User})
 		if err != nil {
 			fmt.Printf("Can't add article, go error %v\n", err)
 			c.JSON(400, gin.H{
