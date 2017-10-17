@@ -80,8 +80,9 @@ func getNextCommentID(db *mgo.Database) int {
 	}
 	_, err := db.C("counter").Find(bson.M{"_id": "comments"}).Apply(change, &result)
 
-	if err != nil {
-		fmt.Printf("Can't get next comment ID , go err %v\n", err)
+	if err != nil { // If counter collection with id comments doesnt exist, create it
+		db.C("counter").Insert(bson.M{"_id": "comments", "counterValue": 1})
+		return 1
 	}
 	newID := result["counterValue"].(int)
 	return newID
