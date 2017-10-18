@@ -23,10 +23,10 @@ func main() {
 
 	router.Use(middlewares.Connect)
 
-	router.Use(static.Serve("/", static.LocalFile("./public", false)))
+	router.Use(static.Serve("/", static.LocalFile("../frontend/build", false)))
 
 	router.NoRoute(func(c *gin.Context) {
-		c.File("./public/index.html")
+		c.File("../frontend/build/index.html")
 	})
 
 	api := router.Group("/api")
@@ -52,7 +52,7 @@ func main() {
 		}
 	}
 
-	router.Run(":8080") // listen and serve on 0.0.0.0:8080
+	router.Run(":3001") // listen and serve on 0.0.0.0:8080
 }
 
 func bootstrap(s *mgo.Session) *mgo.Collection {

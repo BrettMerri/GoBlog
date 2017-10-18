@@ -4,21 +4,8 @@
   "description": "blog created with go backend and react frontend",
   "main": "index.js",
   "scripts": {
-    "start": "npm run frontend & npm run backend",
-    "frontend": "watchify -o backend/public/bundle.js -v -d frontend/main.js",
-    "backend": "cd backend; go run main.go"
-  },
-  "dependencies": {
-    "browserify": "^14.4.0",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
-    "react-redux": "^5.0.6",
-    "react-router-dom": "^4.2.2",
-    "react-scripts": "^1.0.14",
-    "reactify": "^1.1.1",
-    "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0",
-    "watchify": "^3.9.0"
+    "frontend": "cd frontend && react-scripts start",
+    "backend": "cd backend && go run main.go"
   },
   "repository": {
     "type": "git",
