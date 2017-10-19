@@ -56,7 +56,7 @@ func Add(c *gin.Context) {
 				"result": false,
 			})
 		} else {
-			article := models.Article{Title: json.Title, Body: json.Body, User: user}
+			article := models.Article{ID: bson.NewObjectId(), Title: json.Title, Body: json.Body, User: user}
 			err := db.C("articles").Insert(&article)
 			if err != nil {
 				fmt.Printf("Can't add article, go error %v\n", err)

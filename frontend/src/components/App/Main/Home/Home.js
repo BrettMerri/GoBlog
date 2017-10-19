@@ -43,6 +43,7 @@ class Home extends Component {
         <AddArticleForm
           display={this.props.displayAddArticleForm}
           onSubmit={this.addArticleSubmit}
+          isPosting={this.props.isPosting}
         />
         <ArticleContainer
           articleData={this.props.articleData}
@@ -59,10 +60,10 @@ const mapStateToProps = (state) => {
       articlesAreLoading: state.articlesAreLoading,
       displayAddArticleForm: state.showAddArticleForm,
       articleIsPosting: state.articleIsPosting,
-      postedArticleData: state.postedArticleData,
       userData: state.userData,
       usersAreLoading: state.usersAreLoading,
-      userSelected: state.userSelected
+      userSelected: state.userSelected,
+      isPosting: state.articleIsPosting
   }
 }
 

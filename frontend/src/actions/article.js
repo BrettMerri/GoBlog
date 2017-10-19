@@ -68,6 +68,7 @@ export function postNewArticle(values, userId) {
             if (!response.ok) {
                 throw Error(response.statusText);
             }
+            dispatch(showAddArticleForm(false));
             dispatch(articleIsPosting(false));
             return response;
         })

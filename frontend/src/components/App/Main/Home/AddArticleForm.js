@@ -49,7 +49,7 @@ const AddArticleForm = (props) => {
             placeholder="Body"
         />
         <div className="form-group mx-sm-3">
-            <button type="submit" className="btn btn-default" disabled={props.submitting}>Submit</button>
+            <button type="submit" className="btn btn-default" disabled={props.isPosting}>Submit</button>
         </div>
     </form>
     );

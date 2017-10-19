@@ -7,10 +7,12 @@ export function articlesAreLoading(state = false, action) {
     }
 }
 
-export function articleData(state = {}, action) {
+export function articleData(state = [], action) {
     switch (action.type) {
         case 'ARTICLE_FETCH_DATA_SUCCESS':
-            return action.articleData;
+            return action.articleData; 
+        case 'ARTICLE_POST_NEW_ARTICLE_SUCCESS':
+            return [action.articleData, ...state]
         default:
             return state;
     }
@@ -29,15 +31,6 @@ export function articleIsPosting(state = false, action) {
     switch (action.type) {
         case 'ARTICLE_IS_POSTING':
             return action.isPosting;
-        default:
-            return state;
-    }
-}
-
-export function postedArticleData(state = {}, action) {
-    switch (action.type) {
-        case 'ARTICLE_POST_NEW_ARTICLE_SUCCESS':
-            return action.articleData;
         default:
             return state;
     }
