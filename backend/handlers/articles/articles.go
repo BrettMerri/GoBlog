@@ -62,6 +62,7 @@ func Add(c *gin.Context) {
 				fmt.Printf("Can't add article, go error %v\n", err)
 				c.JSON(400, gin.H{
 					"result": false,
+					"err":    err,
 				})
 			} else {
 				c.JSON(200, gin.H{

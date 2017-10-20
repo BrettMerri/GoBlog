@@ -15,7 +15,6 @@ func Add(c *gin.Context) {
 	var err error
 	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
-		nextCommentID := getNextCommentID(db)
 		user := models.User{}
 		err := db.C("users").FindId(json.User.ID).One(&user)
 		if err != nil {
@@ -24,7 +23,8 @@ func Add(c *gin.Context) {
 				"result": false,
 			})
 		} else {
-			pushComment := bson.M{"$push": bson.M{"comments": bson.M{"id": nextCommentID, "body": json.Body, "user": user}}}
+			comment := models.Comment{ID: bson.NewObjectId(), Body: json.Body, User: user}
+			pushComment := bson.M{"$push": bson.M{"comments": comment}}
 
 			err := db.C("articles").Update(bson.M{"_id": json.Article}, pushComment)
 
@@ -32,10 +32,12 @@ func Add(c *gin.Context) {
 				fmt.Printf("Can't add comment, go error %v\n", err)
 				c.JSON(400, gin.H{
 					"result": false,
+					"err":    err,
 				})
 			} else {
 				c.JSON(200, gin.H{
-					"result": true,
+					"result":  true,
+					"comment": comment,
 				})
 			}
 		}
@@ -52,7 +54,7 @@ func Delete(c *gin.Context) {
 	if err = c.BindJSON(&json); err == nil {
 		db := c.MustGet("db").(*mgo.Database)
 
-		pullComment := bson.M{"$pull": bson.M{"comments": bson.M{"id": json.ID}}}
+		pullComment := bson.M{"$pull": bson.M{"comments": bson.M{"_id": json.ID}}}
 
 		err := db.C("articles").Update(bson.M{"_id": json.Article}, pullComment)
 
@@ -60,6 +62,7 @@ func Delete(c *gin.Context) {
 			fmt.Printf("Can't remove comment, go error %v\n", err)
 			c.JSON(400, gin.H{
 				"result": false,
+				"err":    err,
 			})
 		} else {
 			c.JSON(200, gin.H{
@@ -70,20 +73,4 @@ func Delete(c *gin.Context) {
 		fmt.Println(err.Error())
 		c.JSON(400, err.Error())
 	}
-}
-
-func getNextCommentID(db *mgo.Database) int {
-	var result bson.M
-	change := mgo.Change{
-		Update:    bson.M{"$inc": bson.M{"counterValue": 1}},
-		ReturnNew: true,
-	}
-	_, err := db.C("counter").Find(bson.M{"_id": "comments"}).Apply(change, &result)
-
-	if err != nil { // If counter collection with id comments doesnt exist, create it
-		db.C("counter").Insert(bson.M{"_id": "comments", "counterValue": 1})
-		return 1
-	}
-	newID := result["counterValue"].(int)
-	return newID
 }
